@@ -3,6 +3,7 @@ from pathlib import Path
 from tkinter import ttk  #un upgrade estetic la tkinter
 from tkinterdnd2 import DND_FILES, TkinterDnD  #wrapper peste tkinter cu functionalitati de drag and drop
 import pandas as pd
+from tkinter import messagebox
 
 class Aplication(TkinterDnD.Tk):
     def __init__(self):
@@ -56,8 +57,7 @@ class DataTable(ttk.Treeview): #Treeview este o clasa care ofera vizualizarea da
         #deci o sa caut spre exemplu Calorii=10
         new_df = self.stored_dataframe
         for col, value in pairs.items():
-            query_string = f"{col}.str.contains('{value}')"
-            new_df = new_df.query(query_string, engine="python")
+            new_df = new_df[new_df[col].astype(str).str.contains(str(value))] #!!!!
         self._draw_table(new_df)    
         #pentru fiecare pereche coloana-valoare din tabelul de perechi va cauta coloana cu numele col(Durata) si stringuri care contin
         #pe value(10) de pe aceasta coloana si va face un nou dataframe cu ele si il va desena
@@ -93,14 +93,19 @@ class SearchPage(tk.Frame): # deci pagina asta este un Frame din tkinter
         file_paths = self._parse_drop_files(event.data) #deci file_paths este o lsita
         current_listbox_items = set(self.file_names_listbox.get(0, "end"))
         for file_path in file_paths:
+            if Path(file_path).suffix != '.csv': #!!!!
+                messagebox.showinfo(title="!", message="Sorry, this is not a CSV file")
+                raise Exception("Sorry, this is not a CSV file")
             path_object = Path(file_path)
             file_name = path_object.name
+            #am folosit obiecte de tip Path din libraria pathlib pentru a obtine mai rapid numele fisierului folosind metoda .name
             if file_name not in current_listbox_items:
                 self.file_names_listbox.insert("end", file_name)
                 self.path_map[file_name] = file_path
-
+      #de asemenea am lucrat cu set pentru a nu regasi in lista de fisiere un fisier de mai multe ori
+                  
     def _display_file(self, event):
-        file_name = self.file_names_listbox.get(self.file_names_listbox.curselection())
+        file_name = self.file_names_listbox.get(self.file_names_listbox.curselection()) #folosim curselection ca sa obtinem numele fisierului pe care dam dubluclick
         path = self.path_map[file_name]
         df = pd.read_csv(path)
         self.data_table.set_datatable(dataframe=df)
@@ -125,6 +130,9 @@ class SearchPage(tk.Frame): # deci pagina asta este un Frame din tkinter
 
 
     def _parse_drop_files(self, filename):
+        #cu functia aceasta vom stoca path-urile fisierelor
+        #observam in ss2 si ss3 ca pathrile sunt concatenate in acelasi string si se regasesc si o pereche de {}
+        #functia trateaza orice caz posibil si stocheaza cu succes path-urile 
         #acesta este filename-ul cand fac drag and drop la data 2.csv si data.csv simultan
         #'{D:/py/pitonu/data 2.csv} D:/py/pitonu/data.csv'
         size = len(filename)
@@ -141,6 +149,8 @@ class SearchPage(tk.Frame): # deci pagina asta este un Frame din tkinter
                 name=""
                 idx = j
             elif filename[idx] == " " and name != "":
+                #pentru exemplul '{D:/py/pitonu/data 2.csv} D:/py/pitonu/data.csv' nu se intra in acest elif
+                #dar pentru exemplul 'D:/py/pitonu/data2.csv D:/py/pitonu/data.csv' observam ca se intra in elif si deci se trateaza si genul asta de date de intrare in event
                 res.append(name)
                 name=""
             elif filename[idx] != " ":
