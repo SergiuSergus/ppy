@@ -33,37 +33,37 @@ class DataTable(ttk.Treeview): #Treeview este o clasa care ofera vizualizarea da
 
         self.stored_dataframe = pd.DataFrame() #un data frame gol
 
-        def set_datatable(self, dataframe):
-            self.stored_dataframe = dataframe
-            self._draw_table(dataframe)
+    def set_datatable(self, dataframe):
+        self.stored_dataframe = dataframe
+        self._draw_table(dataframe)
 
-        def _draw_table(self, dataframe):
-            self.delete(*self.get_children()) #curatam tot ce era in treeview
-            columns = list(dataframe.columns) #facem o lista cu numele coloanelor, cuma ar fi Durata, Puls, MaxPuls, Calorii din data.csv
-            self.__setitem__("column", columns) #setam coloanele treeview-ului("column") cu numele coloanelor din dataframe
-            self.__setitem__("show", "headings") #spunem ca treeview-ul vrem sa aibe headings
+    def _draw_table(self, dataframe):
+        self.delete(*self.get_children()) #curatam tot ce era in treeview
+        columns = list(dataframe.columns) #facem o lista cu numele coloanelor, cuma ar fi Durata, Puls, MaxPuls, Calorii din data.csv
+        self.__setitem__("column", columns) #setam coloanele treeview-ului("column") cu numele coloanelor din dataframe
+        self.__setitem__("show", "headings") #spunem ca treeview-ul vrem sa aibe headings
 
-            for col in columns:
-                self.heading(col, text=col)  #setam headings cu numele coloanelor din dataframe, primul argument col este un index, astfel
-                    #primului heading(0) ii corepsunde numele coloanei de la indexul 0 si tot asa mai departe. 
+        for col in columns:
+            self.heading(col, text=col)  #setam headings cu numele coloanelor din dataframe, primul argument col este un index, astfel
+                #primului heading(0) ii corepsunde numele coloanei de la indexul 0 si tot asa mai departe. 
 
-            df_rows = dataframe.to_numpy().tolist() #facem o lista de liste cu continutul efectiiv al tabelului si le inseram in acesta
-            for row in df_rows:
-                self.insert("", "end", values=row)
-            return None
+        df_rows = dataframe.to_numpy().tolist() #facem o lista de liste cu continutul efectiiv al tabelului si le inseram in acesta
+        for row in df_rows:
+            self.insert("", "end", values=row)
+        return None
         
-        def find_value(self, pairs): #pairs este un dictionar
-            #deci o sa caut spre exemplu Calorii=10
-            new_df = self.stored_dataframe
-            for col, value in pairs.items():
-                query_string = f"{col}.str.contains('{value}')"
-                new_df = new_df.query(query_string, engine="python")
-            self._draw_table(new_df)    
-            #pentru fiecare pereche coloana-valoare din tabelul de perechi va cauta coloana cu numele col(Durata) si stringuri care contin
-            #pe value(10) de pe aceasta coloana si va face un nou dataframe cu ele si il va desena
+    def find_value(self, pairs): #pairs este un dictionar
+        #deci o sa caut spre exemplu Calorii=10
+        new_df = self.stored_dataframe
+        for col, value in pairs.items():
+            query_string = f"{col}.str.contains('{value}')"
+            new_df = new_df.query(query_string, engine="python")
+        self._draw_table(new_df)    
+        #pentru fiecare pereche coloana-valoare din tabelul de perechi va cauta coloana cu numele col(Durata) si stringuri care contin
+        #pe value(10) de pe aceasta coloana si va face un nou dataframe cu ele si il va desena
 
-        def reset_table(self):
-            self._draw_table(self.stored_dataframe) #pt ca stored_dataframe era un DataFrame() gol   
+    def reset_table(self):
+        self._draw_table(self.stored_dataframe) #pt ca stored_dataframe era un DataFrame() gol   
 
 class SearchPage(tk.Frame): # deci pagina asta este un Frame din tkinter
     def __init__(self, parent):
