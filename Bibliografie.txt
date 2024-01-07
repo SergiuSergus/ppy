@@ -1,6 +1,0 @@
-csv viewer with tk: https://www.youtube.com/watch?v=Wq1MmAtp1oY&list=PLCQT7jmSF-LrwYppkB3Xdbe6QC81-ozmT&index=9
-tkinter introduction: https://www.youtube.com/watch?v=YXPyB4XeYLA
-.astype(str): https://www.w3schools.com/python/pandas/ref_df_astype.asp
-despre exceptii: https://www.w3schools.com/python/python_try_except.asp
-.suffix din pathlib: https://stackoverflow.com/questions/5899497/how-can-i-check-the-extension-of-a-file
-
